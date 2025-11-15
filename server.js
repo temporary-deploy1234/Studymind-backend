@@ -32,7 +32,7 @@ app.post("/analyze", async (req, res) => {
     - Weekly timetable
     `;
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateText(prompt);
 
     const response = result.response.text();
 
@@ -45,4 +45,5 @@ app.post("/analyze", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
+
 
