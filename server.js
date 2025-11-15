@@ -6,44 +6,40 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Insert your NEW API key here
-const genAI = new GoogleGenerativeAI(process.env.API_KEY || "AIzaSyAKoXcGU2xfCM1kGpgnUwpYo9zsWbjyhuo");
+const genAI = new GoogleGenerativeAI({ apiKey: "AIzaSyDcQhxsfVOL5qtYNfbBXEyeTxFMoSv01mc" });
 
 app.post("/analyze", async (req, res) => {
   try {
     const userData = req.body;
 
-    // Correct supported model for v1beta API
+    // Get the model
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash-latest"
     });
 
-    const prompt = `
-    Analyze this student's study habits:
-    ${JSON.stringify(userData)}
+    // Generate content
+    const result = await model.generate({
+      prompt: `
+Analyze this student's study habits:
+${JSON.stringify(userData)}
 
-    Provide:
-    - Strengths
-    - Weaknesses
-    - Procrastination pattern
-    - Memory improvement plan
-    - Personalized study plan
-    - Daily schedule (morning/evening)
-    - Weekly timetable
-    `;
+Give:
+- Strengths
+- Weaknesses
+- Procrastination pattern
+- Memory improvement plan
+- Personalized study plan
+- Daily schedule (morning/evening)
+- Weekly timetable
+      `,
+      temperature: 0.7
+    });
 
-    const result = await model.generateText(prompt);
-
-    const response = result.response.text();
-
-    res.json({ reply: response });
-
+    // The text is inside result.output_text
+    res.json({ reply: result.output_text });
   } catch (err) {
-    console.error("ERROR:", err.message);
     res.json({ error: err.message });
   }
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
-
-
